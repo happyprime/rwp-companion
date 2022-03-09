@@ -14,9 +14,9 @@ function enqueue_assets() {
 
 		// This view expects tabset handling to be loaded.
 		if ( $rwp_tabset ) {
-			wp_enqueue_style( 'bootstrap', plugin_dir_url( __DIR__ ) . 'assets/rmarkdown/tables.css', array(), null );
-			wp_enqueue_script( 'bootstrap', plugin_dir_url( __DIR__ ) . 'assets/rmarkdown/bootstrap.min.js', array( 'jquery' ), null, true );
-			wp_enqueue_script( 'tabsets', plugin_dir_url( __DIR__ ) . 'assets/rmarkdown/tabsets.js', array(), null, true );
+			wp_enqueue_style( 'bootstrap', plugin_dir_url( __DIR__ ) . 'assets/rmarkdown/tables.css', array(), null ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+			wp_enqueue_script( 'bootstrap', plugin_dir_url( __DIR__ ) . 'assets/rmarkdown/bootstrap.min.js', array( 'jquery' ), null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+			wp_enqueue_script( 'tabsets', plugin_dir_url( __DIR__ ) . 'assets/rmarkdown/tabsets.js', array(), null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 		}
 	}
 }
