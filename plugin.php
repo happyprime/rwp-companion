@@ -30,4 +30,7 @@ if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
 	return;
 }
 
+require_once __DIR__ . '/includes/assets.php';
+require_once __DIR__ . '/includes/common.php';
 require_once __DIR__ . '/includes/meta.php';
+require_once __DIR__ . '/includes/template.php';
