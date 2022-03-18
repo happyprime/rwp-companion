@@ -1,6 +1,6 @@
 # RWP Companion
 
-A companion plugin for the RWP package used to publish to WordPress with R.
+A companion plugin for the [RWP package](https://github.com/happyprime/RWP/) used to publish to WordPress with R.
 
 ## Description
 
