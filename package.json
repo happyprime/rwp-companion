@@ -1,0 +1,16 @@
+{
+	"name": "rwp-companion",
+	"version": "1.1.0",
+	"description": "A companion plugin for the RWP package used to publish to WordPress with R.",
+	"author": "Happy Prime",
+	"license": "GPL-2.0-or-later",
+	"devDependencies": {
+	  "@wordpress/scripts": "^22.2.1"
+	},
+	"scripts": {
+	  "start": "wp-scripts start",
+	  "build": "wp-scripts build",
+	  "lint:js": "wp-scripts lint-js",
+	  "fix:js": "wp-scripts lint-js --fix"
+	}
+  }
