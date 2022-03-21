@@ -1,153 +1,130 @@
-/**
- * This tabsets.js file is copied from the rmarkdown project and was originally
- * distributed under the GPL 3.0 license.
- *
- * @see https://github.com/rstudio/rmarkdown
- *
- * jQuery Plugin: Sticky Tabs
- *
- * @author Aidan Lister <aidan@php.net>
- * adapted by Ruben Arslan to activate parent tabs too
- * http://www.aidanlister.com/2014/03/persisting-the-tab-state-in-bootstrap/
- */
-(function($) {
-  "use strict";
-  $.fn.rmarkdownStickyTabs = function() {
-    var context = this;
-    // Show the tab corresponding with the hash in the URL, or the first tab
-    var showStuffFromHash = function() {
-      var hash = window.location.hash;
-      var selector = hash ? 'a[href="' + hash + '"]' : 'li.active > a';
-      var $selector = $(selector, context);
-      if($selector.data('toggle') === "tab") {
-        $selector.tab('show');
-        // walk up the ancestors of this element, show any hidden tabs
-        $selector.parents('.section.tabset').each(function(i, elm) {
-          var link = $('a[href="#' + $(elm).attr('id') + '"]');
-          if(link.data('toggle') === "tab") {
-            link.tab("show");
-          }
-        });
-      }
-    };
+{
+	// build a tabset from a section div with the .tabset class
 
+	/**
+	 * Build a tabset from a section div with the .tabset class.
+	 *
+	 * @param {*} tabset
+	 */
+	const buildTabset = (tabset) => {
+		// Determine the heading level to use.
+		const match = tabset.className.match(/level(\d) /);
+		if (!match) {
+			return;
+		}
 
-    // Set the correct tab when the page loads
-    showStuffFromHash(context);
+		const tabsetLevel = Number(match[1]);
+		const tabLevel = tabsetLevel + 1;
 
-    // Set the correct tab when a user uses their back/forward button
-    $(window).on('hashchange', function() {
-      showStuffFromHash(context);
-    });
+		// Find all subheadings.
+		const tabs = tabset.querySelectorAll('div.section.level' + tabLevel);
 
-    // Change the URL when tabs are clicked
-    $('a', context).on('click', function(e) {
-      history.pushState(null, null, this.href);
-      showStuffFromHash(context);
-    });
+		if (!tabs.length) {
+			return;
+		}
 
-    return this;
-  };
-}(jQuery));
+		const fade = tabset.classList.contains('tabset-fade');
+		const pills = tabset.classList.contains('tabset-pills');
+		const navClass = pills ? 'nav-pills' : 'nav-tabs';
 
-window.buildTabsets = function(tocID) {
+		// create tablist and tab-content elements
+		const tabList = document.createElement('ul');
 
-  // build a tabset from a section div with the .tabset class
-  function buildTabset(tabset) {
+		tabList.className = 'nav ' + navClass;
+		tabList.setAttribute('role', 'tablist');
 
-    // check for fade and pills options
-    var fade = tabset.hasClass("tabset-fade");
-    var pills = tabset.hasClass("tabset-pills");
-    var navClass = pills ? "nav-pills" : "nav-tabs";
+		tabs[0].parentNode.insertBefore(tabList, tabs[0]);
 
-    // determine the heading level of the tabset and tabs
-    var match = tabset.attr('class').match(/level(\d) /);
-    if (match === null)
-      return;
-    var tabsetLevel = Number(match[1]);
-    var tabLevel = tabsetLevel + 1;
+		const tabContent = document.createElement('div');
 
-    // find all subheadings immediately below
-    var tabs = tabset.find("div.section.level" + tabLevel);
-    if (!tabs.length)
-      return;
+		tabContent.className = 'tab-content';
 
-    // create tablist and tab-content elements
-    var tabList = jQuery('<ul class="nav ' + navClass + '" role="tablist"></ul>');
-    jQuery(tabs[0]).before(tabList);
-    var tabContent = jQuery('<div class="tab-content"></div>');
-    jQuery(tabs[0]).before(tabContent);
+		tabs[0].parentNode.insertBefore(tabContent, tabs[0]);
 
-    // build the tabset
-    var activeTab = 0;
-    tabs.each(function(i) {
+		tabs.forEach(function (tab) {
+			// get the id then sanitize it for use with bootstrap tabs
+			let id = tab.id;
 
-      // get the tab div
-      var tab = jQuery(tabs[i]);
+			// sanitize the id for use with bootstrap tabs
+			id = id.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_');
+			tab.id = id;
 
-      // get the id then sanitize it for use with bootstrap tabs
-      var id = tab.attr('id');
+			// get the heading element within it, grab it's text, then remove it
+			const heading = tab.querySelector('h' + tabLevel);
+			const headingText = heading.innerHTML;
 
-      // see if this is marked as the active tab
-      if (tab.hasClass('active'))
-        activeTab = i;
+			heading.remove();
 
-      // remove any table of contents entries associated with
-      // this ID (since we'll be removing the heading element)
-      jQuery("div#" + tocID + " li a[href='#" + id + "']").parent().remove();
+			// build and append the tab list item
+			const anchor = document.createElement('a');
 
-      // sanitize the id for use with bootstrap tabs
-      id = id.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_');
-      tab.attr('id', id);
+			anchor.innerText = headingText;
+			anchor.href = '#' + id;
+			anchor.setAttribute('role', 'tab');
+			anchor.setAttribute('data-toggle', 'tab');
+			anchor.setAttribute('aria-controls', id);
 
-      // get the heading element within it, grab it's text, then remove it
-      var heading = tab.find('h' + tabLevel + ':first');
-      var headingText = heading.html();
-      heading.remove();
+			const listItem = document.createElement('li');
 
-      // build and append the tab list item
-      var a = jQuery('<a role="tab" data-toggle="tab">' + headingText + '</a>');
-      a.attr('href', '#' + id);
-      a.attr('aria-controls', id);
-      var li = jQuery('<li role="presentation"></li>');
-      li.append(a);
-      tabList.append(li);
+			listItem.setAttribute('role', 'presentation');
+			listItem.appendChild(anchor);
 
-      // set it's attributes
-      tab.attr('role', 'tabpanel');
-      tab.addClass('tab-pane');
-      tab.addClass('tabbed-pane');
-      if (fade)
-        tab.addClass('fade');
+			tabList.appendChild(listItem);
 
-      // move it into the tab content div
-      tab.detach().appendTo(tabContent);
-    });
+			// set it's attributes
+			tab.setAttribute('role', 'tabpanel');
+			tab.classList.add('tab-pane');
+			tab.classList.add('tabbed-pane');
 
-    // set active tab
-    jQuery(tabList.children('li')[activeTab]).addClass('active');
-    var active = jQuery(tabContent.children('div.section')[activeTab]);
-    active.addClass('active');
-    if (fade)
-      active.addClass('in');
+			if (fade) {
+				tab.classList.add('fade');
+			}
 
-    if (tabset.hasClass("tabset-sticky"))
-      tabset.rmarkdownStickyTabs();
-  }
+			// move it into the tab content div
+			tabContent.appendChild(tab);
+		});
 
-  // convert section divs with the .tabset class to tabsets
-  var tabsets = jQuery("div.section.tabset");
-  tabsets.each(function(i) {
-    buildTabset(jQuery(tabsets[i]));
-  });
-};
+		// set active tab
+		const tableListItems = tabList.querySelectorAll('li ');
 
-jQuery(document).ready(function () {
-	window.buildTabsets("TOC");
-});
+		tableListItems[0].classList.add('active');
 
-jQuery(document).ready(function () {
-	jQuery('.tabset-dropdown > .nav-tabs > li').click(function () {
-		jQuery(this).parent().toggleClass('nav-tabs-open');
+		const tableSections = tabContent.querySelectorAll('.section');
+		const active = tableSections[0];
+
+		active.classList.add('active');
+		if (fade) {
+			active.classList.add('in');
+		}
+
+		tableListItems.forEach((el) => {
+			el.addEventListener('click', (event) => {
+				event.preventDefault();
+
+				tableListItems.forEach((listItem) => {
+					listItem.classList.remove('active');
+				});
+
+				tableSections.forEach((section) => {
+					section.classList.remove('active');
+				});
+
+				event.target.parentNode.classList.add('active');
+				tabContent
+					.querySelector(
+						'#' + event.target.getAttribute('aria-controls')
+					)
+					.classList.add('active');
+			});
+		});
+	};
+
+	window.addEventListener('DOMContentLoaded', () => {
+		// convert section divs with the .tabset class to tabsets
+		const tabsets = document.querySelectorAll('.section.tabset');
+
+		tabsets.forEach((tabset) => {
+			buildTabset(tabset);
+		});
 	});
-});
+}
