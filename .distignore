@@ -1,5 +1,10 @@
 .distignore
 .editorconfig
 .git
+.github
 .gitignore
+node_modules
+package.json
+package-lock.json
 README.md
+webpack.config.js
