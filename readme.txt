@@ -27,6 +27,10 @@ Note: This is still under active initial development and subject to change.
 
 ## Changelog
 
+### 1.1.0
+
+* Remove Bootstrap dependency for tabbed tables.
+
 ### 1.0.0
 
 Initial release.
