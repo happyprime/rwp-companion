@@ -4,13 +4,32 @@
 	"description": "A companion plugin for the RWP package used to publish to WordPress with R.",
 	"author": "Happy Prime",
 	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"dotorg-plugin",
+		"r",
+		"wordpress-plugin"
+	],
+	"homepage": "https://github.com/happyprime/rwp-companion/",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/happyprime/rwp-companion.git"
+	},
+	"bugs": {
+		"url": "https://github.com/happyprime/rwp-companion/issues"
+	},
 	"devDependencies": {
-	  "@wordpress/scripts": "^22.2.1"
+		"@wordpress/npm-package-json-lint-config": "^5.10.0",
+		"@wordpress/scripts": "^22.2.1",
+		"npm-package-json-lint": "^8.0.0"
 	},
 	"scripts": {
-	  "start": "wp-scripts start",
-	  "build": "wp-scripts build",
-	  "lint:js": "wp-scripts lint-js",
-	  "fix:js": "wp-scripts lint-js --fix"
+		"start": "wp-scripts start",
+		"build": "wp-scripts build",
+		"lint:js": "wp-scripts lint-js",
+		"fix:js": "wp-scripts lint-js --fix",
+		"lint:package": "node ./node_modules/npm-package-json-lint/dist/cli.js ./package.json"
+	},
+	"npmpackagejsonlint": {
+		"extends": "@wordpress/npm-package-json-lint-config"
 	}
-  }
+}
